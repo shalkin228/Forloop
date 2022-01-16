@@ -6,19 +6,39 @@ using UnityEngine.Events;
 
 public class ChessSystem : MonoBehaviour
 {
-    public static int currentStep;
+    public static int currentStep
+    {
+        get
+        {
+            return instance._currentStep;
+        }
+        set
+        {
+            instance._currentHalfStep = 0;
+            instance._currentStep = value;
+
+            if(value == 1)
+            {
+                instance.StartChessSteps();
+            }
+            else
+            {
+                NextHalfStep(1);
+            }
+        }
+    }
     public static ChessSystem instance;
     public static UnityEvent _onReadyToUse = new UnityEvent();
     public List<ChessTile> tiles = new List<ChessTile>();
-    public List<IStepable> characters = new List<IStepable>();
+    public List<CharacterBase> characters = new List<CharacterBase>();
 
     [SerializeField] private float _stepCooldown;
     private Camera _mainCamera;
-    private int _currentHalfStep;
+    private int _currentHalfStep, _currentStep;
 
-    public static void NextHalfStep()
+    public static void NextHalfStep(float duration = .5f)
     {
-
+        instance.StartCoroutine(instance.NextHalfStepCooldown(duration));
     } 
 
     public static ChessTile ConvertCordinates(Vector2 cordinates)
@@ -48,7 +68,7 @@ public class ChessSystem : MonoBehaviour
                 try
                 {
                     if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot != TileSlot.Open
+                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
                         && returnOnlyOpenTiles)
                     {
                         tiles.Add(ConvertCordinates(cordinate));
@@ -62,7 +82,7 @@ public class ChessSystem : MonoBehaviour
                 try
                 {
                     if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot != TileSlot.Open
+                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
                         && returnOnlyOpenTiles)
                     {
                         tiles.Add(ConvertCordinates(cordinate));
@@ -76,7 +96,7 @@ public class ChessSystem : MonoBehaviour
                 try
                 {
                     if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot != TileSlot.Open
+                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
                         && returnOnlyOpenTiles)
                     {
                         tiles.Add(ConvertCordinates(cordinate));
@@ -90,7 +110,7 @@ public class ChessSystem : MonoBehaviour
                 try
                 {
                     if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot != TileSlot.Open
+                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
                         && returnOnlyOpenTiles)
                     {
                         tiles.Add(ConvertCordinates(cordinate));
@@ -102,13 +122,51 @@ public class ChessSystem : MonoBehaviour
         return tiles.ToArray();
     }
 
-    private IEnumerator NextHalfStepCooldown()
+    public void StartChessSteps()
     {
-        yield return new WaitForSeconds(.5f);
+        StartCoroutine(NextFirstStepCooldown(1f));
+    }
 
-        instance._currentHalfStep++;
+    private IEnumerator NextFirstStepCooldown(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        ResortCharacters();
 
         instance.characters[instance._currentHalfStep].OnYourStep();
+        instance._currentHalfStep++;
+
+       /* if (_currentHalfStep >= instance.characters.Count)
+        {
+            currentStep++;
+        }*/
+    }
+
+    private IEnumerator NextHalfStepCooldown(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        instance.characters[0].OnYourStep();
+        instance._currentHalfStep++;
+
+        /*if (_currentHalfStep >= instance.characters.Count)
+        {
+            currentStep++;
+        }*/
+    }
+
+    private void ResortCharacters()
+    {
+        foreach(CharacterBase character in FindObjectsOfType<CharacterBase>())
+        {
+            this.characters.Add(character);
+        }
+
+        CharacterBase[] characters = this.characters.ToArray();
+
+        Array.Sort(characters);
+
+        this.characters = new List<CharacterBase>(characters);
     }
 
     private void Awake()
@@ -116,6 +174,8 @@ public class ChessSystem : MonoBehaviour
         instance = this;
 
         _mainCamera = Camera.main;
+
+        currentStep++;
     }
 
     private void Update()

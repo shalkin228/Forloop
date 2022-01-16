@@ -4,19 +4,37 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CharacterBase : MonoBehaviour, IStepable
+public class CharacterBase : MonoBehaviour, IComparer
 {
     public static CharacterBase instance;
     public Vector2 boardPos;
     public TileSlot characterType;
 
-    [SerializeField] private float _minRotationLerpingStopDistance,
-        _minMovingLerpingStopDistance,
-        _rotationSpeed, _moveSpeed;
     protected Rigidbody _rigidbody;
-    private float _spawnUpperPos = .5f;
-    protected TurningDirection _currentDirection;
-    private UnityEvent _OnRotationComplete = new UnityEvent();
+    protected float _spawnUpperPos = .5f;
+    protected UnityEvent _OnRotationComplete = new UnityEvent();
+    protected UnityEvent _OnMoveComplete = new UnityEvent();
+    protected Coroutine _rotationInstance;
+
+    private readonly float _minRotationLerpingStopDistance = 1f;
+    private readonly float _minMovingLerpingStopDistance = 1e-05f;
+    private readonly float _rotationSpeed = 14;
+    private readonly float _moveSpeed = 15;
+
+
+    public int Compare(object x, object y)
+    {
+        CharacterBase character = (CharacterBase)x;
+        CharacterBase character2 = (CharacterBase)y;
+
+        if ((int)character.characterType == (int)character2.characterType)
+        {
+            return 0;
+        }
+
+        return (int)character.characterType > (int)character2.characterType
+            ? 1 : -1;
+    }
 
     public virtual void OnYourStep()
     {
@@ -34,14 +52,14 @@ public class CharacterBase : MonoBehaviour, IStepable
         instance = this;
     }
 
-    private void Start()
+    protected void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
 
         ChessSystem._onReadyToUse.AddListener(() => Setup());
     }
 
-    private void Setup()
+    protected void Setup()
     {
         ChessTile tile = ChessSystem.ConvertCordinates(boardPos);
         tile.tileSlot = characterType;
@@ -52,31 +70,55 @@ public class CharacterBase : MonoBehaviour, IStepable
             tile.transform.position.z);
     }
 
-    private void RotateToTile(Vector2 tilePos)
+    protected void RotateToTile(Vector2 tilePos)
     {
         if (tilePos.x > boardPos.x)
         {
-            StartCoroutine(RotateToRotation(Quaternion.Euler(0, -90, 0),
-                TurningDirection.Right));
+            if(_rotationInstance != null)
+            {
+                StopCoroutine(_rotationInstance);
+            }
+
+            _rotationInstance = 
+                StartCoroutine(RotateToRotation(Quaternion.Euler(0, -90, 0)
+                ));
         }
         else if (tilePos.x < boardPos.x)
         {
-            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 90, 0),
-                TurningDirection.Left));
+            if (_rotationInstance != null)
+            {
+                StopCoroutine(_rotationInstance);
+            }
+
+            _rotationInstance =
+            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 90, 0)
+                ));
         }
         else if (tilePos.y > boardPos.y)
         {
-            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 180, 0), 
-                TurningDirection.Up));
+            if (_rotationInstance != null)
+            {
+                StopCoroutine(_rotationInstance);
+            }
+
+            _rotationInstance =
+            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 180, 0) 
+                ));
         }
         else if (tilePos.y < boardPos.y)
         {
-            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 0, 0),
-                TurningDirection.Down));
+            if (_rotationInstance != null)
+            {
+                StopCoroutine(_rotationInstance);
+            }
+
+            _rotationInstance =
+            StartCoroutine(RotateToRotation(Quaternion.Euler(0, 0, 0)
+                ));
         }
     }
 
-    private IEnumerator MoveToPos(Vector2 boardPos)
+    protected IEnumerator MoveToPos(Vector2 boardPos)
     {
         Vector3 pos = ChessSystem.ConvertCordinates(boardPos).transform.position;
         pos.y = transform.position.y;
@@ -90,37 +132,30 @@ public class CharacterBase : MonoBehaviour, IStepable
 
             yield return new WaitForFixedUpdate();
         }
-
+         
         ChessSystem.ConvertCordinates(boardPos).tileSlot = characterType;
+        ChessSystem.ConvertCordinates(this.boardPos).tileSlot = TileSlot.Open;
+
+        this.boardPos = boardPos;
+
+        _OnMoveComplete.Invoke();
+        _OnMoveComplete.RemoveAllListeners();
     }
 
-    private IEnumerator RotateToRotation(Quaternion rotation,
-        TurningDirection dir)
+    protected IEnumerator RotateToRotation(Quaternion rotation)
     {
-        yield return new WaitForSeconds(.5f);
-
-        _currentDirection = dir;
-
         while (Mathf.Abs(Quaternion.Angle(transform.rotation, rotation)) >
-                _minRotationLerpingStopDistance && _currentDirection == dir)
+                _minRotationLerpingStopDistance)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation,
-                rotation, _rotationSpeed * Time.fixedDeltaTime);
+            _rigidbody.MoveRotation(Quaternion.Lerp(transform.rotation,
+                rotation, _rotationSpeed * Time.fixedDeltaTime));
 
             yield return new WaitForFixedUpdate();
         }
 
-        if(_currentDirection == dir)
-        {
-            _currentDirection = TurningDirection.None;
-        }
+        _rotationInstance = null;
 
         _OnRotationComplete.Invoke();
         _OnRotationComplete.RemoveAllListeners();
-    }
-
-    public enum TurningDirection
-    {
-        Down, Up, Right, Left, None
     }
 }

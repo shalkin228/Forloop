@@ -445,15 +445,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1069668524}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44f22c2b6235e1a46aa2a7e9f5aa5fc0, type: 3}
+  m_Script: {fileID: 11500000, guid: 63628dd257fea94409953feb881e4bad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pos: {x: 1, y: 1}
-  _characterType: 0
-  _minRotationLerpingStopDistance: 1
-  _minMovingLerpingStopDistance: 0.00001
-  _rotationSpeed: 14
-  _moveSpeed: 15
+  boardPos: {x: 2, y: 1}
+  characterType: 0
 --- !u!1 &1212302585
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,7 +869,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87ddbfe91444d28439a1daa3f5fdeaf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tiles: []
+  tiles: []
+  characters: []
+  _stepCooldown: 0
 --- !u!1 &233892533744995529
 GameObject:
   m_ObjectHideFlags: 0
@@ -1610,3 +1608,9 @@ MonoBehaviour:
   isSelected: 0
   pos: {x: 0, y: 0}
   material: {fileID: 0}
+  OnMouseDown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseSelected:
+    m_PersistentCalls:
+      m_Calls: []
