@@ -14,10 +14,10 @@ public class PlayerCharacterBase : CharacterBase
 
         foreach(ChessTile tile in _currentTiles)
         {
-            tile.Turn(true);
-
             tile.OnMouseSelected.AddListener(OnMouseTileSelect);
             tile.OnMouseDown.AddListener(OnMouseTileDown);
+
+            tile.Turn(true);
         }
     }
 

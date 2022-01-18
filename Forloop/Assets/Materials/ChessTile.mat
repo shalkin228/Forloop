@@ -130,7 +130,7 @@ Material:
     m_Colors:
     - BaseColor: {r: 0.8018868, g: 0.7795111, b: 0.17147255, a: 0}
     - Fresnel_Color: {r: 0.9150943, g: 0.9132284, b: 0.057553, a: 0}
-    - HologramTextureTiling: {r: 1, g: 3, b: 0, a: 0}
+    - HologramTextureTiling: {r: 1, g: 5, b: 0, a: 0}
     - Hologram_Tiling: {r: 64, g: 64, b: 0, a: 0}
     - Main_Color: {r: 0.6827848, g: 0.6520594, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

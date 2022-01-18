@@ -9,17 +9,30 @@ public class ChessTile : MonoBehaviour
     public bool isSelected;
     public Vector2 pos;
     public Material material;
-    public UnityEvent<ChessTile> OnMouseDown, OnMouseSelected = new UnityEvent<ChessTile>();
+    public UnityEvent<ChessTile> OnMouseDown, OnMouseSelected, OnMouseDeSelected 
+        = new UnityEvent<ChessTile>();
 
     private MeshRenderer _meshRenderer;
-    private float _dissolveSpeed = 15f;
+    private float _dissolveSpeed = 10f;
     private float _lerpingSpeed = 5f;
-    private float _minLerpingDistance = .01f;
+    private float _minLerpingDistance = .001f;
     private bool _isTurningOn, _deltaSelected;
-    private Coroutine _movingInstance;
+    private Vector3 _standartPos;
+    private LerpingDirection _curDir;
 
     public void Turn(bool on)
     {
+        if (on)
+        {
+            transform.position = _standartPos;
+        }
+
+        if (isSelected)
+        {
+            OnMouseSelected.Invoke(this);
+        }
+
+        material.SetFloat("Dissolve", on ? .2f : .7f);
         StartCoroutine(Dissolve(on));
     }
 
@@ -42,14 +55,27 @@ public class ChessTile : MonoBehaviour
 
     public void DeSelect()
     {
+        OnMouseDeSelected.Invoke(this);
+
         isSelected = false;
     }
 
     private IEnumerator LerpToPoint(Vector3 point)
     {
-        float curSpeed = _lerpingSpeed * Time.fixedDeltaTime;
+        if(point == _standartPos)
+        {
+            _curDir = LerpingDirection.Down;
+        }
+        else
+        {
+            _curDir = LerpingDirection.Up;
+        }
 
-        while(Vector3.Distance(transform.position, point) > _minLerpingDistance)
+        float curSpeed = _lerpingSpeed * Time.fixedDeltaTime;
+        var _oldDir = _curDir;
+
+        while(Vector3.Distance(transform.position, point) > _minLerpingDistance &&
+            _curDir == _oldDir)
         {
             transform.position = Vector3.Lerp(transform.position, point,
                 curSpeed);
@@ -84,10 +110,14 @@ public class ChessTile : MonoBehaviour
 
             yield return new WaitForFixedUpdate();
         }
+
+        material.SetFloat("Dissolve", 1);
     }
 
     private void Start()
     {
+        _standartPos = transform.position;
+
         _meshRenderer = GetComponentInChildren<MeshRenderer>();
 
         material = _meshRenderer.material;
@@ -110,6 +140,11 @@ public class ChessTile : MonoBehaviour
         {
             DeSelect();
         }
+    }
+
+    private enum LerpingDirection
+    {
+        None, Up, Down
     }
 }
 public enum TileSlot {  Player, Enemy, Wall, PlayerStep, Open}
