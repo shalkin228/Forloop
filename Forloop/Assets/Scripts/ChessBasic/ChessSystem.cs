@@ -38,7 +38,7 @@ public class ChessSystem : MonoBehaviour
     private Camera _mainCamera;
     private int _currentHalfStep, _currentStep;
 
-    public static void NextHalfStep(float duration = .5f)
+    public static void NextHalfStep(float duration = .2f)
     {
         instance.StartCoroutine(instance.NextHalfStepCooldown(duration));
     } 

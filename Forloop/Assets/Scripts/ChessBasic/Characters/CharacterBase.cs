@@ -39,6 +39,7 @@ public class CharacterBase : MonoBehaviour, IComparer
     public virtual void OnYourStep()
     {
         // Some realization
+        ChessSystem.NextHalfStep();
     }
 
     public void MoveToPoint(Vector2 boardPos)
