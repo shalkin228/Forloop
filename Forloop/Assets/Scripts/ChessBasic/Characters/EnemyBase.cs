@@ -80,6 +80,8 @@ public class EnemyBase : CharacterBase
 
     protected virtual IEnumerator EyeLightTurning(bool on)
     {
+        print(1);
+
         float newIntensity = on ? _lightMaxIntensity : 0;
 
         while (Mathf.DeltaAngle(_eyes[0].intensity, newIntensity) > .01f)
@@ -105,9 +107,11 @@ public class EnemyBase : CharacterBase
             {
                 playerFinded = true;
 
+                _OnRotationComplete.AddListener(() =>
+                   StartCoroutine(EyeLightTurning(true)));
                 RotateToTile(tile.pos);
-                _OnRotationComplete.AddListener(() => 
-                StartCoroutine(EyeLightTurning(true)));
+
+                break;
             }
         }
 
