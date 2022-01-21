@@ -43,6 +43,8 @@ public class CharacterBase : MonoBehaviour, IComparer
 
     public void MoveToPoint(Vector2 boardPos)
     {
+        ChessSystem.ConvertCordinates(boardPos).tileSlot = characterType;
+
         _OnRotationComplete.AddListener(() => StartCoroutine(MoveToPos(boardPos)));
         RotateToTile(boardPos);
     }
@@ -52,14 +54,14 @@ public class CharacterBase : MonoBehaviour, IComparer
         instance = this;
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
 
         ChessSystem._onReadyToUse.AddListener(() => Setup());
     }
 
-    protected void Setup()
+    protected virtual void Setup()
     {
         ChessTile tile = ChessSystem.ConvertCordinates(boardPos);
         tile.tileSlot = characterType;

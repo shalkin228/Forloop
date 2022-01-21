@@ -104,68 +104,6 @@ MonoBehaviour:
     m_Value: 0
     min: -100
     max: 100
---- !u!114 &-4224079771117534422
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
-  m_Name: DepthOfField
-  m_EditorClassIdentifier: 
-  active: 0
-  m_AdvancedMode: 0
-  mode:
-    m_OverrideState: 1
-    m_Value: 1
-  gaussianStart:
-    m_OverrideState: 1
-    m_Value: 0.21
-    min: 0
-  gaussianEnd:
-    m_OverrideState: 1
-    m_Value: 0.79
-    min: 0
-  gaussianMaxRadius:
-    m_OverrideState: 1
-    m_Value: 1.5
-    min: 0.5
-    max: 1.5
-  highQualitySampling:
-    m_OverrideState: 1
-    m_Value: 0
-  focusDistance:
-    m_OverrideState: 1
-    m_Value: 0.41
-    min: 0.1
-  aperture:
-    m_OverrideState: 1
-    m_Value: 1
-    min: 1
-    max: 32
-  focalLength:
-    m_OverrideState: 1
-    m_Value: 1
-    min: 1
-    max: 300
-  bladeCount:
-    m_OverrideState: 1
-    m_Value: 3
-    min: 3
-    max: 9
-  bladeCurvature:
-    m_OverrideState: 0
-    m_Value: 1
-    min: 0
-    max: 1
-  bladeRotation:
-    m_OverrideState: 0
-    m_Value: 0
-    min: -180
-    max: 180
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,7 +118,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   components:
   - {fileID: 1307310356167374428}
-  - {fileID: -4224079771117534422}
   - {fileID: 6726124223973605859}
   - {fileID: -7696971953316750715}
   - {fileID: -5123216093086213887}
@@ -202,7 +139,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   mode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 2
 --- !u!114 &5449412979604731112
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -227,7 +164,7 @@ MonoBehaviour:
     max: 100
   colorFilter:
     m_OverrideState: 1
-    m_Value: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
+    m_Value: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
     hdr: 1
     showAlpha: 0
     showEyeDropper: 1

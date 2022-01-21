@@ -16,6 +16,7 @@ public class ChessSystem : MonoBehaviour
         {
             instance._currentHalfStep = 0;
             instance._currentStep = value;
+            onNextStep.Invoke();
 
             if(value == 1)
             {
@@ -23,12 +24,13 @@ public class ChessSystem : MonoBehaviour
             }
             else
             {
-                NextHalfStep(1);
+                NextHalfStep(0);
             }
         }
     }
     public static ChessSystem instance;
     public static UnityEvent _onReadyToUse = new UnityEvent();
+    public static UnityEvent onNextStep = new UnityEvent();
     public List<ChessTile> tiles = new List<ChessTile>();
     public List<CharacterBase> characters = new List<CharacterBase>();
 
@@ -65,59 +67,30 @@ public class ChessSystem : MonoBehaviour
             if(i == 0)
             {
                 cordinate.x--;
-                try
-                {
-                    if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
-                        && returnOnlyOpenTiles)
-                    {
-                        tiles.Add(ConvertCordinates(cordinate));
-                    }
-                }
-                catch { }
             }
             else if(i == 1)
             {
                 cordinate.x++;
-                try
-                {
-                    if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
-                        && returnOnlyOpenTiles)
-                    {
-                        tiles.Add(ConvertCordinates(cordinate));
-                    }
-                }
-                catch{}
             }
             else if (i == 2)
             {
                 cordinate.y++;
-                try
-                {
-                    if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
-                        && returnOnlyOpenTiles)
-                    {
-                        tiles.Add(ConvertCordinates(cordinate));
-                    }
-                }
-                catch { }
             }
             else if (i == 3)
             {
                 cordinate.y--;
-                try
-                {
-                    if (ConvertCordinates(cordinate) != null ||
-                        ConvertCordinates(cordinate).tileSlot == TileSlot.Open
-                        && returnOnlyOpenTiles)
-                    {
-                        tiles.Add(ConvertCordinates(cordinate));
-                    }
-                }
-                catch { }
             }
+            try
+            {
+                if (ConvertCordinates(cordinate) != null &&
+                    !returnOnlyOpenTiles ||
+                    ConvertCordinates(cordinate).tileSlot == TileSlot.Open
+                    && returnOnlyOpenTiles)
+                {
+                    tiles.Add(ConvertCordinates(cordinate));
+                }
+            }
+            catch { }
         }
         return tiles.ToArray();
     }
@@ -135,24 +108,22 @@ public class ChessSystem : MonoBehaviour
 
         instance.characters[instance._currentHalfStep].OnYourStep();
         instance._currentHalfStep++;
-
-       /* if (_currentHalfStep >= instance.characters.Count)
-        {
-            currentStep++;
-        }*/
     }
 
     private IEnumerator NextHalfStepCooldown(float duration)
     {
         yield return new WaitForSeconds(duration);
 
-        instance.characters[0].OnYourStep();
-        instance._currentHalfStep++;
-
-        /*if (_currentHalfStep >= instance.characters.Count)
+        try
+        {
+            instance.characters[_currentHalfStep].OnYourStep();
+        }
+        catch
         {
             currentStep++;
-        }*/
+            yield break;
+        }
+        instance._currentHalfStep++;
     }
 
     private void ResortCharacters()
@@ -164,7 +135,7 @@ public class ChessSystem : MonoBehaviour
 
         CharacterBase[] characters = this.characters.ToArray();
 
-        Array.Sort(characters);
+        Array.Sort(characters, characters[0].GetComponent<IComparer>());
 
         this.characters = new List<CharacterBase>(characters);
     }
