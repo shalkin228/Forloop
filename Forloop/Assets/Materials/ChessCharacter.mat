@@ -90,7 +90,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Dissolve: 0.656
+    - Dissolve: 0
     - EdgeStandart: 0.04
     - EdgeWidth: 0.1
     - _AlphaClip: 0
