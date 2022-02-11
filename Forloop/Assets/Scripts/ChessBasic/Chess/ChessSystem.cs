@@ -33,6 +33,7 @@ public class ChessSystem : MonoBehaviour
     public static UnityEvent onNextStep = new UnityEvent();
     public List<ChessTile> tiles = new List<ChessTile>();
     public List<CharacterBase> characters = new List<CharacterBase>();
+    public GameObject location;
 
     [SerializeField] private float _stepCooldown;
     private Camera _mainCamera;

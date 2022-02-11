@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Chess Table
   - Ground
+  - SpawnPoint
+  - LocationCamera
   layers:
   - Default
   - TransparentFX
@@ -15,12 +17,12 @@ TagManager:
   - UI
   - Post-Processing
   - Ground
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerBullet
+  - EnemyBullet
+  - Enemy
+  - FightSpace
+  - FightPostProcessing
   - 
   - 
   - 

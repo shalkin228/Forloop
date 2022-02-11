@@ -6,12 +6,14 @@ using UnityEngine.Events;
 public class EnemyBase : CharacterBase
 {
     [SerializeField] protected int _instantiateOnStep;
+    [SerializeField] protected GameObject _fightEnemy;
     [SerializeField] protected float _lightMaxIntensity, _lightTurnSpeed;
     [SerializeField] protected Vector2[] _path;
     protected int _currentPathNum;
     protected MeshRenderer _meshRenderer;
     protected BoxCollider _collider;
     protected List<Light> _eyes = new List<Light>();
+    protected UnityEvent _onEyeTurnedRed = new UnityEvent();
 
     private UnityAction _setupAction;
 
@@ -80,8 +82,6 @@ public class EnemyBase : CharacterBase
 
     protected virtual IEnumerator EyeLightTurning(bool on)
     {
-        print(1);
-
         float newIntensity = on ? _lightMaxIntensity : 0;
 
         while (Mathf.DeltaAngle(_eyes[0].intensity, newIntensity) > .01f)
@@ -95,6 +95,9 @@ public class EnemyBase : CharacterBase
                 eye.intensity = Mathf.Lerp(eye.intensity, newIntensity, delta);
             }
         }
+
+        _onEyeTurnedRed.Invoke();
+        _onEyeTurnedRed.RemoveAllListeners();
     }
 
     protected virtual void StartFight()
@@ -108,7 +111,11 @@ public class EnemyBase : CharacterBase
                 playerFinded = true;
 
                 _OnRotationComplete.AddListener(() =>
-                   StartCoroutine(EyeLightTurning(true)));
+                FightManager.StartFight
+                (ChessSystem.instance.location,
+                PlayerCharacterBase._currentPlayer._playerFightCharacter,
+                _fightEnemy,
+                this));
                 RotateToTile(tile.pos);
 
                 break;

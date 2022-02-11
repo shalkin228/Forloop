@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class PlayerCharacterBase : CharacterBase
 {
+    public static PlayerCharacterBase _currentPlayer;
+    public GameObject _playerFightCharacter;
     protected ChessTile[] _currentTiles;
 
     public override void OnYourStep()
@@ -19,6 +21,11 @@ public class PlayerCharacterBase : CharacterBase
 
             tile.Turn(true);
         }
+    }
+
+    private void Awake()
+    {
+        _currentPlayer = this;
     }
 
     private void OnMouseTileSelect(ChessTile tile)

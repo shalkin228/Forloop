@@ -2,60 +2,140 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
-public class PlayerBase : MonoBehaviour
+[RequireComponent(typeof(ActorBody))]
+public class PlayerBase : MonoBehaviour, IDamagable
 {
-    [SerializeField] protected float _maxFallSpeed, _maxMoveSpeed, _jumpForce;
-    [SerializeField] protected InputAction _action, _jump;
-    protected Rigidbody2D _rigidbody2D;
-    protected float _horizontal;
-    protected GroundCheck _groundCheck;
+    public static PlayerBase instance;
 
-    private void Start()
+    public bool canBeDamaged = true;
+
+    [SerializeField] protected float _maxMoveSpeed, _maxHealth;
+    [SerializeField] protected InputActionReference _action;
+    protected ActorBody _actorBody;
+    protected bool _canBeDamaged = true;
+    protected float _horizontal, _jumpTimer, _fallTimer, _currentHealth;
+    protected float _afterDamageCooldown = 1f;
+    protected Vector2 _velocity;
+
+    public void Damage(int damage)
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        _groundCheck = GetComponentInChildren<GroundCheck>();
-    }
+        if (!_canBeDamaged || !canBeDamaged) return;
 
-    private void OnEnable()
-    {
-        _action.Enable();
-        _jump.Enable();
+        _currentHealth -= damage;
 
-        _jump.performed += ctx =>
+        if(_currentHealth <= 0)
         {
-            if (_groundCheck.isGrounded)
-            {
-                _rigidbody2D.velocity = new Vector2(0, _jumpForce);
-            }
-        };
+            Death();
+        }
 
-        _action.performed += ctx => Move(ctx.ReadValue<float>());
-        _action.canceled += ctx => _horizontal = 0;
+        StartCoroutine(AfterDamageCooldown());
     }
 
-    private void Move(float horizontal)
+    public void Heal(int amount)
+    {
+        _currentHealth += amount;
+        _currentHealth = Mathf.Min(_currentHealth, _maxHealth);
+    }
+
+    protected IEnumerator AfterDamageAnimation()
+    {
+        bool alpha = true;
+
+        var sprites = GetComponentsInChildren<SpriteRenderer>();
+
+        while (!_canBeDamaged)
+        {
+            if (alpha)
+            {
+                foreach (SpriteRenderer sprite in sprites)
+                {
+                    var newColor = sprite.color;
+                    newColor.a = .5f;
+
+                    sprite.color = newColor;
+                }
+            }
+            else
+            {
+                foreach (SpriteRenderer sprite in sprites)
+                {
+                    var newColor = sprite.color;
+                    newColor.a = 1;
+
+                    sprite.color = newColor;
+                }
+            }
+
+            alpha = !alpha;
+
+            yield return new WaitForSeconds(.2f);
+        }
+
+        foreach (SpriteRenderer sprite in sprites)
+        {
+            var newColor = sprite.color;
+            newColor.a = 1;
+
+            sprite.color = newColor;
+        }
+    }
+
+    protected IEnumerator AfterDamageCooldown()
+    {
+        _canBeDamaged = false;
+
+        StartCoroutine(AfterDamageAnimation());
+
+        yield return new WaitForSeconds(_afterDamageCooldown);
+
+        _canBeDamaged = true;
+    }
+
+    protected void Death()
+    {
+        Destroy(gameObject);
+    }
+
+    protected virtual void Awake()
+    {
+        instance = this;
+
+        _currentHealth = _maxHealth;
+    }
+
+    protected virtual void Start()
+    {
+        _actorBody = GetComponent<ActorBody>();
+    }
+
+    protected virtual void OnEnable()
+    {
+        _action.action.Enable();
+
+        _action.action.performed += ctx => Move(ctx.ReadValue<float>());
+        _action.action.canceled += ctx => _horizontal = 0;
+    }
+
+    protected virtual void Move(float horizontal)
     {
         _horizontal = horizontal;
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
-        _jump.Disable();
-        _action.Disable();
+        _action.action.Disable();
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         if (Mathf.Abs(_horizontal) > .5f)
         {
-            _rigidbody2D.MovePosition((Vector2)transform.position +
-                new Vector2(
-                    (_horizontal > 0 ? _maxMoveSpeed : -_maxMoveSpeed)
-                    * Time.fixedDeltaTime, 0));
+            _velocity += Vector2.right *
+                ((_horizontal > 0 ? _maxMoveSpeed : -_maxMoveSpeed) 
+                * Time.fixedDeltaTime);
         }
 
-        _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
-            Mathf.Clamp(_rigidbody2D.velocity.y, -_maxFallSpeed, _jumpForce));
+        _actorBody.Move(_velocity);
+        _velocity = Vector2.zero;
     }
 }
