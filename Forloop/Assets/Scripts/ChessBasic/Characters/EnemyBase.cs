@@ -21,6 +21,7 @@ public class EnemyBase : CharacterBase
     {
         ChessSystem.ConvertCordinates(boardPos).tileSlot =
             TileSlot.Open;
+        ChessSystem.instance.characters.Remove(this);
         Destroy(gameObject);
     }
 
@@ -34,12 +35,12 @@ public class EnemyBase : CharacterBase
 
         try
         {
+            print(Time.time);
             MoveToPoint(_path[_currentPathNum]);
         }
         catch
         {
             TryStartFight();
-            return;
         }
         _currentPathNum++;
         _OnMoveComplete.AddListener(() => StartFight());
@@ -114,7 +115,6 @@ public class EnemyBase : CharacterBase
 
         foreach (ChessTile tile in ChessSystem.OverlapBox(boardPos, false))
         {
-            print(1);
             if (tile.tileSlot == TileSlot.Player)
             {
                 playerFinded = true;
