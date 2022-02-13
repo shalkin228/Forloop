@@ -11,13 +11,17 @@ public class EnemyFightBase : MonoBehaviour, IDamagable
 
     protected ActorBody _actorBody;
     protected Vector2 _spawnPoint;
+    protected bool _isKilled;
 
     public virtual void Damage(int damage)
     {
+        if (_isKilled) return;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)
         {
+            _isKilled = true;
             StartCoroutine(Death());
         }
     }

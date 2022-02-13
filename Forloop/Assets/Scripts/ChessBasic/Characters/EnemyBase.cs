@@ -17,6 +17,13 @@ public class EnemyBase : CharacterBase
 
     private UnityAction _setupAction;
 
+    public void Remove()
+    {
+        ChessSystem.ConvertCordinates(boardPos).tileSlot =
+            TileSlot.Open;
+        Destroy(gameObject);
+    }
+
     public override void OnYourStep()
     {
         if (!_meshRenderer.enabled)
@@ -31,7 +38,8 @@ public class EnemyBase : CharacterBase
         }
         catch
         {
-            ChessSystem.NextHalfStep(0);
+            TryStartFight();
+            return;
         }
         _currentPathNum++;
         _OnMoveComplete.AddListener(() => StartFight());
@@ -98,6 +106,35 @@ public class EnemyBase : CharacterBase
 
         _onEyeTurnedRed.Invoke();
         _onEyeTurnedRed.RemoveAllListeners();
+    }
+
+    protected virtual void TryStartFight()
+    {
+        bool playerFinded = false;
+
+        foreach (ChessTile tile in ChessSystem.OverlapBox(boardPos, false))
+        {
+            print(1);
+            if (tile.tileSlot == TileSlot.Player)
+            {
+                playerFinded = true;
+
+                _OnRotationComplete.AddListener(() =>
+                FightManager.StartFight
+                (ChessSystem.instance.location,
+                PlayerCharacterBase._currentPlayer._playerFightCharacter,
+                _fightEnemy,
+                this));
+                RotateToTile(tile.pos);
+
+                break;
+            }
+        }
+
+        if (!playerFinded)
+        {
+            ChessSystem.NextHalfStep(0);
+        }
     }
 
     protected virtual void StartFight()

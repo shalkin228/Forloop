@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class LocationManager : MonoBehaviour
 {
+    public static LocationManager instance;
+
     [SerializeField] private Transform _playerSpawnPoint, _enemySpawnPoint;
 
     public void Setup(GameObject enemy, GameObject player)
@@ -16,5 +18,10 @@ public class LocationManager : MonoBehaviour
 
         instantiatedPlayer.transform.position = _playerSpawnPoint.position;
         instantiatedEnemy.transform.position = _enemySpawnPoint.position;
+    }
+
+    private void Awake()
+    {
+        instance = this;
     }
 }

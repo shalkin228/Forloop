@@ -86,8 +86,9 @@ public class EnemyFightSkeleton : EnemyFightBase
 
         foreach(Transform stoneSocket in _stoneSockets)
         {
-            stones.Add(Instantiate(_stone,
-            stoneSocket.position, Quaternion.identity)
+            stones.Add(Instantiate(_stone, 
+            stoneSocket.position, Quaternion.identity,
+            transform.parent)
             .GetComponent<SkeletonStone>());
 
             stones[stones.Count - 1].target =

@@ -22,6 +22,10 @@ public class FightManager : MonoBehaviour
     {
         TabletManager.instance.CloseTablet();
 
+        _enemy.Remove();
 
+        Destroy(LocationManager.instance.gameObject);
+
+        ChessSystem.NextHalfStep(1.5f);
     }
 }
