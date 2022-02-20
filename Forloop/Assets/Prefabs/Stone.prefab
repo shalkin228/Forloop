@@ -4983,7 +4983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b1eeea1e32bdec4988398edd22a35a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 150
+  _moveSpeed: 50
   _damage: 1
   _onCollided:
     m_PersistentCalls:

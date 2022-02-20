@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+
 [RequireComponent(typeof(ActorBody))]
 public class PlayerBase : MonoBehaviour, IDamagable
 {
@@ -93,6 +95,7 @@ public class PlayerBase : MonoBehaviour, IDamagable
 
     protected void Death()
     {
+        SceneManager.LoadScene("Main");
         Destroy(gameObject);
     }
 

@@ -49,8 +49,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 10
-  _afterAttackCooldown: 1
-  _firstAttackCooldown: 2
+  _afterAttackCooldown: 0.5
+  _firstAttackCooldown: 0.5
   _stoneSockets:
   - {fileID: 3644751941331250177}
   - {fileID: 3644751940168393774}

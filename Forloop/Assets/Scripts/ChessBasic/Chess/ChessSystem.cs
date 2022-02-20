@@ -98,7 +98,7 @@ public class ChessSystem : MonoBehaviour
 
     public void StartChessSteps()
     {
-        StartCoroutine(NextFirstStepCooldown(1f));
+        StartCoroutine(NextFirstStepCooldown(2f));
     }
 
     private IEnumerator NextFirstStepCooldown(float duration)

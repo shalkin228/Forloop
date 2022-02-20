@@ -35,7 +35,6 @@ public class EnemyBase : CharacterBase
 
         try
         {
-            print(Time.time);
             MoveToPoint(_path[_currentPathNum]);
         }
         catch
@@ -64,7 +63,7 @@ public class EnemyBase : CharacterBase
         }
     }
 
-    protected override void Setup()
+    protected override IEnumerator Setup()
     {
         _meshRenderer.enabled = false;
 
@@ -85,7 +84,7 @@ public class EnemyBase : CharacterBase
 
             _meshRenderer.enabled = true;
 
-            base.Setup();
+            yield return StartCoroutine(base.Setup());
         }
     }
 

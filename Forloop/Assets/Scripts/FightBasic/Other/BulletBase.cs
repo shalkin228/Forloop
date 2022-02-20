@@ -18,10 +18,10 @@ public class BulletBase : MonoBehaviour
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         _rigidbody2D.MovePosition(transform.position +
-            transform.right * Time.deltaTime * _moveSpeed);
+            transform.right * Time.fixedDeltaTime * _moveSpeed);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

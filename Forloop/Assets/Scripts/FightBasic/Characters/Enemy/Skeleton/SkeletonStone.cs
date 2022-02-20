@@ -68,11 +68,11 @@ public class SkeletonStone : BulletBase
         isReady = true;
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
         if (!isAttacking) return;
 
         _rigidbody2D.MovePosition(transform.position +
-             transform.up * Time.deltaTime * _moveSpeed);
+             transform.up * Time.fixedDeltaTime * _moveSpeed);
     }
 }

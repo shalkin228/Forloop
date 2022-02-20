@@ -59,11 +59,24 @@ public class CharacterBase : MonoBehaviour, IComparer
     {
         _rigidbody = GetComponent<Rigidbody>();
 
-        ChessSystem._onReadyToUse.AddListener(() => Setup());
+        ChessSystem._onReadyToUse.AddListener(() => StartCoroutine(Setup()));
     }
 
-    protected virtual void Setup()
+    protected virtual IEnumerator Setup()
     {
+        if (characterType == TileSlot.Player)
+        {
+            yield return new WaitForSeconds(.5f);
+        }
+        else if (characterType == TileSlot.Enemy)
+        {
+            yield return new WaitForSeconds(Random.Range(.6f, .7f));
+        }
+        else if (characterType == TileSlot.Wall)
+        {
+            yield return new WaitForSeconds(Random.Range(.7f, 1f));
+        }
+
         ChessTile tile = ChessSystem.ConvertCordinates(boardPos);
         tile.tileSlot = characterType;
 
@@ -140,6 +153,13 @@ public class CharacterBase : MonoBehaviour, IComparer
         ChessSystem.ConvertCordinates(this.boardPos).tileSlot = TileSlot.Open;
 
         this.boardPos = boardPos;
+
+        if (characterType == TileSlot.Player && boardPos.y == 7)
+        {
+            print("bounds");
+            // TODO: Another chess starts here
+            yield break;
+        }
 
         _OnMoveComplete.Invoke();
         _OnMoveComplete.RemoveAllListeners();
